@@ -3,7 +3,9 @@
 
 # Files to not ignore
 !/.gitignore
-# !/some_other_files
+# !/templates/tester.tpl
 
 # Folder to not ignore
-!/MQL4/
+!/MQL4/Experts/fxDreame/
+!/MQL4/Include/fxDreame/
+!/templates/
