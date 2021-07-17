@@ -7,7 +7,7 @@
 #property link      ""
 #property version   "1.00"
 #property strict
-#include <fxDreamIncludes.mqh>
+#include <fxDreame/fxDreameIncludes.mqh>
 
 
 sinput string lot_header=" ------ Settings about Lot size and type ------ ";// ------------------ 
@@ -69,6 +69,9 @@ input timeFrames time_frame = m15;//Selected Time Frame
 
 string nextLine = "\n";
 
+double stopLossPrice;
+double takeProfitPrice;
+
 void OnTick()
   {
       string ma_signal = moving_avarage(time_frame);
@@ -76,11 +79,19 @@ void OnTick()
 
       if(ma_signal == "BUY"){
         if(checkForOpening(max_trade_count,trade_gap) == "YES"){
-          OrderSend(_Symbol,OP_BUY,lot_size,Ask,3,NULL,NULL,NULL,0,0,Green);
+
+          buy_sl == true ? stopLossPrice = CalculateStopLoss(true,Ask,buy_sl_Count) : stopLossPrice = NULL ;
+          buy_tp == true ? takeProfitPrice = CalculateTakeProfit(true,Ask,buy_tp_Count) : takeProfitPrice = NULL ;
+
+          OrderSend(_Symbol,OP_BUY,lot_size,Ask,3,stopLossPrice,takeProfitPrice,NULL,0,0,Green);
         }
       } else if(ma_signal == "SELL"){
         if(checkForOpening(max_trade_count,trade_gap) == "YES"){
-          OrderSend(_Symbol,OP_SELL,lot_size,Bid,3,NULL,NULL,NULL,0,0,Red);
+          
+          buy_sl == true ? stopLossPrice = CalculateStopLoss(false,Bid,sell_sl_Count) : stopLossPrice = NULL ;
+          buy_tp == true ? takeProfitPrice = CalculateTakeProfit(false,Bid,sell_tp_Count) : takeProfitPrice = NULL ;
+
+          OrderSend(_Symbol,OP_SELL,lot_size,Bid,3,stopLossPrice,takeProfitPrice,NULL,0,0,Red);
         }
       } 
    
