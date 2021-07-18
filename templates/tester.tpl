@@ -1,10 +1,9 @@
 <chart>
-id=132710242859890132
+id=132710382930636610
 comment=Hint : 
 symbol=EURUSD
 period=60
-leftpos=944
-offline=1
+leftpos=1869
 digits=5
 scale=8
 graph=1
@@ -21,17 +20,17 @@ days=0
 descriptions=0
 shift_size=20
 fixed_pos=32
-window_left=26
-window_top=26
-window_right=1757
-window_bottom=362
+window_left=0
+window_top=0
+window_right=1701
+window_bottom=327
 window_type=3
 background_color=0
 foreground_color=16777215
-barup_color=65280
-bardown_color=255
-bullcandle_color=65280
-bearcandle_color=255
+barup_color=943906
+bardown_color=1839755
+bullcandle_color=943906
+bearcandle_color=1839755
 chartline_color=65280
 volumes_color=3329330
 grid_color=10061943
@@ -46,11 +45,11 @@ name=main
 </indicator>
 <indicator>
 name=Moving Average
-period=10
+period=5
 shift=0
 method=1
 apply=0
-color=65535
+color=16777215
 style=0
 weight=1
 period_flags=0
@@ -58,13 +57,25 @@ show_data=1
 </indicator>
 <indicator>
 name=Moving Average
-period=21
+period=20
 shift=0
 method=1
 apply=0
 color=65535
 style=0
 weight=2
+period_flags=0
+show_data=1
+</indicator>
+<indicator>
+name=Moving Average
+period=50
+shift=0
+method=1
+apply=0
+color=16748574
+style=0
+weight=4
 period_flags=0
 show_data=1
 </indicator>

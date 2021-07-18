@@ -18,24 +18,24 @@ enum lotSizeType{
 input lotSizeType lots_type = dynamic;//Lots Type
 
 input double lot_size = 0.01;//Lot Size
-input int max_trade_count = 5;//Max Trade Count
+input int max_trade_count = 1;//Max Trade Count
 input int trade_gap = 300;//Differance of pips 
 
 sinput string buy_trade_header=" ------ Settings about Buy Trades ------ ";// ------------------ 
 
 input bool allow_buy_trade = true; //Allow Buy Trades
 input bool buy_tp = true;//Allow Take Profit for Buy Trades
-input int buy_tp_Count = 10;// Take Profit for Buy trades
-input bool buy_sl = false;//Allow Stop Loss for Buy Trades
-input int buy_sl_Count = 30;// Stop Loss for Buy trades
+input int buy_tp_Count = 20;// Take Profit for Buy trades
+input bool buy_sl = true;//Allow Stop Loss for Buy Trades
+input int buy_sl_Count = 10;// Stop Loss for Buy trades
 
 sinput string sell_trade_header=" ------ Settings about Sell Trades ------ ";// ------------------ 
 
 input bool allow_sell_trade = true;//Allow Sell Trades
 input bool sell_tp = true;//Allow Take Profit for Sell Trades
-input int sell_tp_Count = 10;// Take Profit for Sell trades
-input bool sell_sl = false;//Allow Stop Loss for Sell Trades
-input int sell_sl_Count = 30;// Stop Loss for Sell trades
+input int sell_tp_Count = 20;// Take Profit for Sell trades
+input bool sell_sl = true;//Allow Stop Loss for Sell Trades
+input int sell_sl_Count = 10;// Stop Loss for Sell trades
 
 sinput string ma_signal_header=" ------ Moving Avarage Signal Selection ------ ";// ------------------ 
 
@@ -71,9 +71,12 @@ string nextLine = "\n";
 
 double stopLossPrice;
 double takeProfitPrice;
+double currentPrice = 0;
 
 void OnTick()
   {
+      currentPrice = Close[0];
+      
       string ma_signal = moving_avarage(time_frame);
       string status = "";
 
@@ -94,13 +97,62 @@ void OnTick()
           OrderSend(_Symbol,OP_SELL,lot_size,Bid,3,stopLossPrice,takeProfitPrice,NULL,0,0,Red);
         }
       } 
+
+      if(
+        OrdersTotal() > 0 &&
+        checkForOpening(max_trade_count,trade_gap) == "NO"
+      ){
+        // UpdateOpenOrders(buy_tp_Count,sell_tp_Count);
+        updateOrder();
+      }
    
+  }
+
+void updateOrder()
+  {
+    double multiplication = 1.0;
+      // Comment("currentPrice: ", currentPrice);
+      for (int i = OrdersTotal() - 1; i >= 0; i--)
+      {
+         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
+         {
+           if (OrderSymbol() == Symbol())
+           {
+             double OpenPrice = OrderOpenPrice();
+
+             if (OrderType() == OP_BUY)
+             {
+               double newSL = OpenPrice + ( (buy_sl_Count * multiplication) * GetPipValue());
+
+               if(currentPrice > newSL)
+               {
+                 OrderModify(OrderTicket(), OpenPrice, newSL, OrderTakeProfit(), OrderExpiration());
+               }
+             } else if (OrderType() == OP_SELL)
+             {
+               double newSL = OpenPrice - ( (sell_sl_Count * multiplication) * GetPipValue());
+               if(currentPrice < newSL)
+               {
+                 OrderModify(OrderTicket(), OpenPrice, newSL, OrderTakeProfit(), OrderExpiration());
+               }
+
+             } else
+             {
+               Comment("Order failed to update with error: ", GetLastError());
+             }
+            //  Comment("OpenPrice: ", OpenPrice);
+           }
+
+         } else 
+         {
+           Comment("Failed to select the order: ", GetLastError());
+         }  
+      }
   }
 
 string moving_avarage(int timeFrame)
   {
     string signal="";
-    double currentPrice = Close[0];
 
     double previousCandleP5 = getMAValue(5,1);
     double currentCandleP5 = getMAValue(5,0);
